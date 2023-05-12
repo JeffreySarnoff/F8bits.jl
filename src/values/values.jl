@@ -20,7 +20,7 @@
 
 pair(u8::Core.UInt8, x) = Pair(u8, Float16(x))
 
-values = [pair(0x00, 0),   pair(0x80, 0),               # 0, NaN
+values = [pair(0x00, 0),   pair(0x80, NaN),             # 0, NaN
           pair(0x01, 1/2^12), pair(0x81, -1/2^12),      # +Tiny, -Tiny
           pair(0x02, 1-63//64), pair(0x82, -(1-63/64)), # minpos, minneg
           pair(0x3E, 1-1//64), pair(0xBE, -(1-1//64)),  # +63//64, -63//64

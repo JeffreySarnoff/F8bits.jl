@@ -18,5 +18,9 @@ I8(x::Core.Int8) = x
 I8(x::Core.Int16) = convert(Core.Int8, clamp(x, typemin(Core.Int8):typemax(Core.Int8)))
 I8(x::Core.Int32) = convert(Core.Int8, clamp(x, typemin(Core.Int8):typemax(Core.Int8)))
 
+U16(x) = convert(Core.UInt16, clamp(x, typemin(Core.UInt16):typemax(Core.UInt16)))
+U32(x) = convert(Core.UInt32, clamp(x, typemin(Core.UInt32):typemax(Core.UInt32)))
 
+I16(x) = convert(Core.UInt16, clamp(x, typemin(Core.Int16):typemax(Core.Int16)))
+I32(x) = convert(Core.UInt32, clamp(x, typemin(Core.Int32):typemax(Core.Int32)))
 

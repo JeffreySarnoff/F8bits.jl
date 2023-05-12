@@ -1,0 +1,15 @@
+name = "F8bits"
+uuid = "dc5c404c-0ed4-418e-874b-c4a47549149d"
+authors = ["Jeffrey Sarnoff <jeffrey.sarnoff@gmail.com>"]
+license = "MIT"
+version = "0.1.0"
+keywords = ["Julia", "8bit", "Floating Point"]
+
+[compat]
+julia = "1.9"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

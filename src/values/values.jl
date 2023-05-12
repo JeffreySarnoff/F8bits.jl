@@ -23,9 +23,13 @@ pair(u8::Core.UInt8, x) = Pair(u8, Float16(x))
 const Huge = pair(0x7E, 2^14)
 const Tiny = pair(0x1/65536 # 1/2^16
 
-values = [pair(0x00, 0),   pair(0x80, NaN),
-          pair(0x
-          pair(0x7F, Inf), pair(0xFF, -Inf),
-          pair(0x7E, Huge), pair(0xFE, -Huge),
+values = [pair(0x00, 0),   pair(0x80, NaN),           # 0, NaN
+          pair(0x01, 1/2^12), pair(0x81, -1/2^12),    # +Tiny, -Tiny
+          pair(0x3E, 1-1/62), pair(0xBE, -(1-1/62)),  # +61//62, -61//62
+          pair(0x3F, 1), pair(0xBF, -1),              # +1, -1
+          pair(0x40, 1+1/62), pair(0xC0, -(1+1/62),   # +63//62, -63//62
+          pair(0x7E, 2^12), pair(0xFE, -2^12),        # +Huge, -Huge
+          pair(0x7F, Inf), pair(0xFF, -Inf),          # +Inf,  -Inf
+       ]
            
   

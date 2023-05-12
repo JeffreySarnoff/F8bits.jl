@@ -20,6 +20,12 @@ specialpatterns = 4  # zero, -inf, +inf, nan
 extrapatterns   = 6  # ±one, ±huge, ±tiny
 availablepatterns = totalpatterns - specialpatterns - extrapatterns # 246 = 2 * 123
 # 61 < 1, 61 > 1
+fracvals60 = collect(1:60) .// 61;
+ratlvals60 = collect(62::121) .// 61;
+fracvals61 = collect(1:61) .// 62;
+ratlvals61 = collect(63::123) .// 62;
+
+
 
 pair(u8::Core.UInt8, x) = Pair(u8, Float16(x))
 

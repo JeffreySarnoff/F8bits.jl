@@ -23,6 +23,13 @@ function F8masks(f8::F8bits)
     F8masks(sgnmask, expmask, sigmask)
 end
 
+struct F8parts
+    sgn::Int8
+    xpn::Int8  # raw exponent
+    exp::Int8  # biased exponent
+    sig::Int8  # significand / 2^k (implicitly)
+    sgb::Int8  # 1 + sig
+end
 
 
 

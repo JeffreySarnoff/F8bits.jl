@@ -23,6 +23,18 @@ function F8masks(f8::F8bits)
     F8masks(sgnmask, expmask, sigmask)
 end
 
+struct F8values
+    bits::F8bits
+    masks::F8masks
+    bias::Int8
+    emin::Int8
+    emax::Int8
+    smin::Rational{Int8}
+    smax::Rational{Int8}    
+end
+    
+    
+    
 struct F8parts
     sgn::Int8
     xpn::Int8  # raw exponent

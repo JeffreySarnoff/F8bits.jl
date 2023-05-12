@@ -19,7 +19,7 @@ totalpatterns = 256
 specialpatterns = 4  # zero, -inf, +inf, nan
 extrapatterns   = 4  # ±huge, ±tiny
 availablepatterns = totalpatterns - specialpatterns - extrapatterns # 248 = 2^3 * 31
-
+# 4 * 62, 2 * 124
 
 pair(u8::Core.UInt8, x) = Pair(u8, Float16(x))
 

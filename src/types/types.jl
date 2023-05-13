@@ -1,3 +1,8 @@
+"""
+     F8bits
+
+bitcounts for each field of an 8-bit float
+""""
 struct F8bits
     sgnbits::Int8
     expbits::Int8
@@ -10,6 +15,11 @@ function F8bits(sgnbits, expbits, sigbits)
     F8bits(Int8(sgnbits), Int8(expbits), Int8(sigbits))
 end
 
+"""
+     F8masks
+
+bitmasks for each field of an 8-bit float
+""""
 struct F8masks
     sgnmask::UInt8
     expmask::UInt8
@@ -23,6 +33,11 @@ function F8masks(f8::F8bits)
     F8masks(sgnmask, expmask, sigmask)
 end
 
+"""
+     F8expon
+
+characteristics of an 8-bit float's exponent field
+""""
 struct F8expon
     bias::Int8
     emin::Int8 # least exponent        (signed)
@@ -35,9 +50,17 @@ function F8expon(bias::Int, emin::Int, emax::Int, mine::Int, maxe::Int)
     F8expon(I8(bias), I8(emin), I8(emax), I8(mine), I8(maxe))
 end
  
-struct F8values
+"""
+     F8sortal
+
+composite fields characterizing this sort of 8-bit float
+""""
+struct F8sortal
     bits::F8bits
     masks::F8masks
     expon::F8expon
 end
     
+
+
+

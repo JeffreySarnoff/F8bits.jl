@@ -2,7 +2,7 @@
      F8bits
 
 bitcounts for each field of an 8-bit float
-""""
+"""
 struct F8bits
     sgnbits::Int8
     expbits::Int8
@@ -19,7 +19,7 @@ end
      F8masks
 
 bitmasks for each field of an 8-bit float
-""""
+"""
 struct F8masks
     sgnmask::UInt8
     expmask::UInt8
@@ -37,7 +37,7 @@ end
      F8expon
 
 characteristics of an 8-bit float's exponent field
-""""
+"""
 struct F8expon
     bias::Int8
     emin::Int8 # least exponent        (signed)
@@ -70,7 +70,7 @@ end
      F8sortal
 
 composite fields characterizing this sort of 8-bit float
-""""
+"""
 struct F8sortal
     bits::F8bits
     masks::F8masks

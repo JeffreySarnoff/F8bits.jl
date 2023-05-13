@@ -33,6 +33,7 @@ function F8masks(f8::F8bits)
     F8masks(sgnmask, expmask, sigmask)
 end
 
+
 """
      F8expon
 
@@ -85,6 +86,39 @@ function F8expon(ebits)
     F8expon(ebits, emin, emax)
 end
 
+
+"""
+     F8signif
+
+characteristics of an 8-bit float's significand field
+"""
+struct F8signif
+    smin::Int8 # least significand
+    smax::Int8 # greatest significand
+    raw_smin::Int8 # smallest raw significand (skips reserved significand value[s])
+    raw_smax::Int8 # largest raw significand  (skips reserved significand value[s])
+end
+ 
+function F8signif(smin::Int, smax::Int, raw_smin::Int, raw_smax::Int)
+    F8signif(I8(smin), I8(smax), I8(raw_smin), I8(raw_smax))
+end
+
+raw_significand_min(significand_bits) = 0
+raw_significand_max(significand_bits) = 2^significand_bits - 1
+significand_max(significand_bits)     = raw_significand_max(significand_bits) // 2^significand_bits
+significand_min(significand_bits)     = 
+raw_significand_min(signficand_bits) // 2^significand_bits
+
+
+function F8signif(significand_bits)
+    smin = significand_min(significand_bits)
+    smax = significand_max(significand_bits)
+    raw_emin = raw_significand_min(significand_bits)
+    raw_emax = raw_significand_max(significand_bits)
+    
+    F8signif(smin, smax, raw_smin, raw_smax)
+end
+
 """
      F8special
 
@@ -126,6 +160,7 @@ struct F8sortal
     bits::F8bits
     masks::F8masks
     expon::F8expon
+    signif::F8signif
     special::F8special
 end
     
@@ -139,14 +174,16 @@ end
 bits152 = F8bits(1, 5, 2);
 masks152 = F8masks(bits152);
 expon152 = F8expon(bits152.expbits);
+signif152 = F8signif(bits152.sigbits);
 special152 = F8special();
-sortal152 = F8sortal(bits152, masks152, expon152, special152);
+sortal152 = F8sortal(bits152, masks152, expon152, signif152, special152);
           
 bits143 = F8bits(1, 4, 3);
 masks143 = F8masks(bits143);
 expon143 = F8expon(bits143.expbits);
+signif143 = F8signif(bits143.sigbits);
 special143 = F8special();
-sortal143 = F8sortal(bits143, masks143, expon143, special143);
+sortal143 = F8sortal(bits143, masks143, expon143, signif143, special143);
 
 
 

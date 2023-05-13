@@ -42,20 +42,39 @@ struct F8expon
     bias::Int8
     emin::Int8 # least exponent        (signed)
     emax::Int8 # greatest exponent     (signed)
-    mine::Int8 # smallest raw exponent (skips reserved exponent value[s])
-    maxe::Int8 # largest raw exponent  (skips reserved exponent value[s])
+    raw_emin::Int8 # smallest raw exponent (skips reserved exponent value[s])
+    raw_emax::Int8 # largest raw exponent  (skips reserved exponent value[s])
 end
  
-function F8expon(bias::Int, emin::Int, emax::Int, mine::Int, maxe::Int)
-    F8expon(I8(bias), I8(emin), I8(emax), I8(mine), I8(maxe))
+function F8expon(bias::Int, emin::Int, emax::Int, raw_emin::Int, raw_emax::Int)
+    F8expon(I8(bias), I8(emin), I8(emax), I8(raw_emin), I8(raw_emax))
 end
 
-function F8expon(ebits, emin, emax)
-    bias = -emin
-    mine = 0
-    maxe = emax + bias
+raw_exponent_min(exponent_bits) = 0
+raw_exponent_max(exponent_bits) = 2^exponent_bits - 1
+exponent_bias(exponent_bits)    = raw_exponent_max(exponent_bits) - 1
+exponent_max(exponent_bits)     = exponent_bias(exponent_bits)
+exponent_min(exponent_bits)     = 1 - exponent_max(exponent_bits)
 
-    F8expon(bias, emin, emax, mine, maxe)
+function F8expon(exponent_bits)
+    bias = exponent_bias(exponent_bits)
+    emin = exponent_min(exponent_bits)
+    emax = exponent_max(exponent_bits)
+    raw_emin = raw_exponent_min(exponent_bits)
+    raw_emax = raw_exponent_max(exponent_bits)
+    
+    F8expon(bias, emin, emax, raw_emin, raw_emax)
+end
+          
+function F8expon(ebits, raw_emax)
+    raw_emin = 0
+    emax = raw_emax >> 1
+    emin = 1 - emax
+    bias = emax
+    raw_emin = 0
+    raw_emax = emax + bias
+
+    F8expon(bias, emin, emax, raw_emin, raw_emax)
 end
 
 function F8expon(ebits)

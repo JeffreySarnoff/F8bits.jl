@@ -67,6 +67,38 @@ function F8expon(ebits)
 end
 
 """
+     F8special
+
+Which special values are available to this sort of 8-bit float
+"""
+struct F8special
+    nan::UInt8
+    nan2::UInt8
+    poszero::UInt8
+    negzero::UInt8
+    projzero::UInt8
+    posinf::UInt8
+    neginf::UInt8
+    projinf::UInt8
+    poshuge::UInt8
+    neghuge::UInt8
+    projhuge::UInt8
+    postiny::UInt8
+    negtiny::UInt8
+    projtiny::UInt8
+end
+
+function F8special(;nan=0xff, nan2=0xff, poszero=0xff, negzero=0xff, projzero=0x00,
+                    posinf=0x7e, neginf=0xfe, projinf=0xff,
+                    poshuge=0x7d, neghuge=0xfd, projhuge=0xff,
+                    postiny=0x7c, negtiny=0xfc, projtiny=0xff, )
+    F8special(nan, nan2, poszero, negzero, projzero,
+                         posinf, neginf, projinf,
+                         poshuge, neghuge, projhuge,
+                         postiny, negtiny, projtiny ) 
+end          
+          
+"""
      F8sortal
 
 composite fields characterizing this sort of 8-bit float
@@ -75,6 +107,7 @@ struct F8sortal
     bits::F8bits
     masks::F8masks
     expon::F8expon
+    special::F8special
 end
     
 

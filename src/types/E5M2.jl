@@ -19,6 +19,7 @@ isnormal(x::UInt8)  = 0b0_00001_00 <= (x & ExpMask) <= 0b0_11110_00
 issubnormal(x::UInt8) = iszero(x & ExpMask) && !iszero(x & SigMask)
 isinf(x::UInt8) =  (x & ~SgnMask) === 0b0_11111_10
 signbit(x::UInt8) = !iszero(x & SgnMask)
+isnan(x::UInt8) = x ===  0b1_11111_11
 
 const NaN52           = 0b1_11111_11
 const PosNaN          = 0b0_11111_11

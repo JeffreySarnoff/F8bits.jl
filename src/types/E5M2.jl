@@ -1,6 +1,7 @@
 const Bias =  15
 const Emax =  15
 const Emin = -14
+const Binades = 30
 
 const NaN52           = 0b1_11111_11
 const PosNaN          = 0b0_11111_11

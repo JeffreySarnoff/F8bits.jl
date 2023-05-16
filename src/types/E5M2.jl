@@ -57,4 +57,33 @@ const MinNegSubnormal = 0b1_00000_01 # -1/2^16
 0b0_11110_11 == 0x7b (123) # (1+3/4) * 2^15
 =#
 
+function value_normal(x::UInt8)
+    iszero(x) && return(zero(Float16))
+    isneg = signbit(x)
+    significand = 1 + ((x & SigMask) // 4)
+    exponent = ((x & ExpMask) >> 2) - Bias
+    absvalue = 2.0^exponent * significand
+    Float16(isneg ? -absvalue : absvalue)
+end
+
+function value_subnormal(x::UInt8)
+    isneg = signbit(x)
+    absvalue = (x & SigMask) * 1//2^14
+    Float16(isneg ? -absvalue : absvalue)
+end
+
+function value_special(x::UInt8)
+    isnan(x) && return Float16(NaN)
+    if isinf(x)
+       signbit(x) && return Float16(-Inf)
+       return Float16(Inf)
+    end
+    throw( ErrorException("unknown special: ($(x))"))
+end     
+    
+function valueof(x::UInt8)
+    isnormal(x) && return value_normal(x)
+    isspecial(x) && return value_special(x)
+    return value_subnormal(x)
+end
 

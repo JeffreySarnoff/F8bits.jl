@@ -4,12 +4,13 @@ const Emin = -14
 
 const NaN52           = 0b1_11111_11
 const PosNaN          = 0b0_11111_11
-const PosInf52        = 0b0_11111_00
-const NegInf52        = 0b1_11111_00
-const PosA            = 0b0_11111_01
-const NegA            = 0b1_11111_01
-const PosB            = 0b0_11111_10
-const NegB            = 0b1_11111_10
+const PosInf52        = 0b0_11111_10
+const NegInf52        = 0b1_11111_10
+
+const PosHuge         = 0b0_11111_01
+const NegHuge         = 0b1_11111_01
+const PosTiny         = 0b0_11111_00
+const NegTiny         = 0b1_11111_00
 
 const Zero52          = 0b0_00000_00
 const MaxPosNormal    = 0b0_11110_11 # 57344 = 2^13 * 7

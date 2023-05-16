@@ -14,22 +14,24 @@ const ExpShift = 2
 const SigShift = 0
 
 const Specials = 8
-isspecial(x::UInt8) = (x & ExpMask) === ExpMask
+const SpecialsMask = 0b0_11111_10
+
+isspecial(x::UInt8) = (x & SpecialsMask) === SpecialsMask
 isnormal(x::UInt8)  = 0b0_00001_00 <= (x & ExpMask) <= 0b0_11110_00
 issubnormal(x::UInt8) = iszero(x & ExpMask) && !iszero(x & SigMask)
 isinf(x::UInt8) =  (x & ~SgnMask) === 0b0_11111_10
 signbit(x::UInt8) = !iszero(x & SgnMask)
-isnan(x::UInt8) = x ===  0b1_11111_11
+isnan(x::UInt8) = (x & 0b0_11111_11) ===  0b0_11111_11
 
 const NaN52           = 0b1_11111_11
-const PosNaN          = 0b0_11111_11
+const NaN52a          = 0b0_11111_11
 const PosInf52        = 0b0_11111_10
 const NegInf52        = 0b1_11111_10
 
-const PosHuge         = 0b0_11111_01
-const NegHuge         = 0b1_11111_01
-const PosTiny         = 0b0_11111_00
-const NegTiny         = 0b1_11111_00
+# const PosHuge         = 0b0_11111_01
+# const NegHuge         = 0b1_11111_01
+# const PosTiny         = 0b0_11111_00
+# const NegTiny         = 0b1_11111_00
 
 const Zero52          = 0b0_00000_00
 const MaxPosNormal    = 0b0_11110_11 # 57344 = 2^13 * 7
@@ -57,33 +59,33 @@ const MinNegSubnormal = 0b1_00000_01 # -1/2^16
 0b0_11110_11 == 0x7b (123) # (1+3/4) * 2^15
 =#
 
-function value_normal(x::UInt8)
+function value_normal(x::UInt8; T=Float16)
     iszero(x) && return(zero(Float16))
     isneg = signbit(x)
     significand = 1 + ((x & SigMask) // 4)
     exponent = ((x & ExpMask) >> 2) - Bias
     absvalue = 2.0^exponent * significand
-    Float16(isneg ? -absvalue : absvalue)
+    T(isneg ? -absvalue : absvalue)
 end
 
-function value_subnormal(x::UInt8)
+function value_subnormal(x::UInt8; T=Float16)
     isneg = signbit(x)
-    absvalue = (x & SigMask) * 1//2^14
-    Float16(isneg ? -absvalue : absvalue)
+    absvalue = (x & SigMask) * 1//2^15
+    T(isneg ? -absvalue : absvalue)
 end
 
-function value_special(x::UInt8)
-    isnan(x) && return Float16(NaN)
+function value_special(x::UInt8; T=Float16)
+    isnan(x) && return T(NaN)
     if isinf(x)
-       signbit(x) && return Float16(-Inf)
-       return Float16(Inf)
+       signbit(x) && return T(-Inf)
+       return T(Inf)
     end
     throw( ErrorException("unknown special: ($(x))"))
 end     
     
-function valueof(x::UInt8)
-    isnormal(x) && return value_normal(x)
-    isspecial(x) && return value_special(x)
-    return value_subnormal(x)
+function valueof(x::UInt8; T=Float16)
+    isnormal(x) && return value_normal(x; T)
+    isspecial(x) && return value_special(x; T)
+    return value_subnormal(x; T)
 end
 

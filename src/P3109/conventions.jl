@@ -1,5 +1,9 @@
-export NaN8, Zero8, Inf8, 
-       isinfnan, ispositive, isnonnegative, isnonpositive, isnegative, isnormal
+export NaN8E3, NaN8E4, NaN8E5,
+       Zero8E3, Zero8E4, Zero8E5,
+       Inf8E3, Inf8E4, Inf8E5,
+       ispositive, isnonnegative, isnonpositive, isnegative,
+       isinfnan, isnormal,
+       isnoninteger, isfractional,  # isnoninteger(1.5) && !isfractional(0.5), isnoninteger(0.5) && isfractional(0.5)
 
 import Base: reinterpret, 
              exponent_bits, significand_bits,
@@ -7,7 +11,8 @@ import Base: reinterpret,
              exponent_bias, exponent_one, exponent_half,
              UInt8, Int8,
              zero, one, iszero, isone,
-             isnan, isinf, isreal, isfinite, isnormal, issubnormal,
+             isnan, isinf, isreal, isfinite, isinteger, issubnormal,
+             nextfloat, prevfloat
 
 abstract type AbstractFloat8 <: AbstractFloat end
 
@@ -114,12 +119,12 @@ for I in (0, 1, 2, 3, 4, 5, 6, 7)
     end; 
 end;
 
-iszero(x::Float8{E}) = value(x) === Zero8
-isnan(x::Float8{E}) = value(x) === NaN8
-isinf(x::Float8{E}) = (value(x) & sign_unmask(Float8{E})) === Inf8
-isreal(x::Float8{E}) = !isnan(x)
-isfinite(x::Float8{E}) = !isinf(x) && !isnan(x)
-isinfnan(x::Float8{E}) = isinf(x) || isnan(x)
+iszero(x::Float8{E}) where {E} = value(x) === Zero8isssf
+isnan(x::Float8{E}) where {E} = value(x) === NaN8
+isinf(x::Float8{E}) where {E} = (value(x) & sign_unmask(Float8{E})) === Inf8
+isreal(x::Float8{E}) where {E} = !isnan(x)
+isfinite(x::Float8{E}) where {E} = !isinf(x) && !isnan(x)
+isinfnan(x::Float8{E}) where {E} = isinf(x) || isnan(x)
 
 signbit(x::Float8{E}) where {E} = (value(x) & sign_mask(Float8{E})) === sign_mask(Float8{E})
 
@@ -128,13 +133,37 @@ isnonnegative(x::Float8{E}) where {E} = !signbit(x) && !isnan(x)
 ispositive(x::Float8{E}) where {E} = (!signbit(x) && !iszero(x)) && !isnan(x)
 isnonpositive(x::Float8{E}) where {E} = (signbit(x) || iszero(x)) && !isnan(x)
 
-function issubnormal(x::T) where {E, T<:Float8{E}}
-    y = reinterpret(Unsigned, x)
-    (iszero(y & exponent_mask(T)) & !iszero(y & significand_mask(T))
+function issubnormal(float8::T) where {E, T<:Float8{E}}
+    x = value(float8)
+    (iszero(x & exponent_mask(T)) & !iszero(x & significand_mask(T))
 end
-       
+
 isnormal(x::Float8{E}) where {E} = !issubnormal(x) && !isinfnan(x)
 
+function isinteger(x::T) where {E, T<:Float8{E}}
+   (isinfnan(x) || x < one(T)) && return false
+   exponent_gte = FP_bias(E) + significand_bits(T)
+   unshift_exponent(x) >= exponent_gte
+end
+              
+isnoninteger(x::Float8{E}) where {E} = !isinteger(x)
+
+FP8_bias(exponent_bits) = 2^(exponent_bits - 1)
+
+FP8_exponent(exponent_bits, exponent) = exponent > 0 ? 2.0^(exponent - FP8_bias(exponent_bits)) :
+                                                       2.0^(exponent - FP8_bias(exponent_bits)-1)
+
+FP8_exponent(exponent_bits, exponent) = 2.0^(exponent - FP8_bias(exponent_bits))
+              
+FP8_significance(significand_bits, exponent, significand) = exponent > 0 ? 1 + significand / 2^significand_bits : 
+                                                                           (significand==3 ? 4 : 
+                                                                           (significand==2 ? 2 : 
+                                                                           (significand == 1 ? 1  :
+                                                                            0))) / 2^significand_bits
+
+FP8_value(exponent_bits, exponent, significand) = FP8_significance(7-exponent_bits, exponent, significand) * 
+                                                  FP8_exponent(exponent_bits, exponent)
+              
 Base.isone
 Base.nextfloat
 Base.prevfloat

@@ -176,8 +176,16 @@ function nextfloat(x::T) where {E, T<:Float8{E}}
     (isposinf(x) || isnan(x)) && return x
     isnonnegative(x) && return T(value(x) + 0x01)
     return T( ((value(x) & sign_unmask(x)) - 0x01) | sign_mask(T) )
-endne
-       
+end
+
+function nextfloat(x::T, n::Int) where {E, T<:Float8{E}}
+    n < 0 && return prevfloat(x, -n)
+    for i in 1:n
+        x = nextfloat(x)
+    end
+    x
+end
+              
 function prevfloat(x::T) where {E, T<:Float8{E}}
     (isneginf(x) || isnan(x)) && return x
     ispositive(x) && return T(value(x) - 0x01)
@@ -185,6 +193,13 @@ function prevfloat(x::T) where {E, T<:Float8{E}}
     return T( ((value(x) & sign_unmask(x)) + 0x01) | sign_mask(T) )
 end
        
+function prevfloat(x::T, n::Int) where {E, T<:Float8{E}}
+    n < 0 && return nextfloat(x, -n)
+    for i in 1:n
+        x = prevfloat(x)
+    end
+    x
+end
        
 FP8_bias(exponent_bits) = 2^(exponent_bits - 1)
 

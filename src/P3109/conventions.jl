@@ -25,17 +25,29 @@ struct Float8{E} <: AbstractFloat8
     x::UInt8
 end
 
-Float8{E}(x::Int8) = Float8{E}(reinterpret(UInt8, x))
+value(fp8::Float8{E}) where {E} = fp8.x
 
-value(float8::Float8{E}) = float8.x
+Float8{E}(fp::Float8{E}) where {E} = fp
+
+Float8{E}(x::UInt16) where {E} = Float8{E}((x & 0x00FF) % UInt8)
+Float8{E}(x::UInt32) where {E} = Float8{E}((x & 0x0000_00FF) % UInt8)
+Float8{E}(x::UInt64) where {E} = Float8{E}((x & 0x0000_0000_0000_00FF) % UInt8)
+
+Float8{E}(x::Int8) where {E}  = Float8{E}(reinterpret(UInt8, x))
+Float8{E}(x::Int16) where {E} = !signbit(x) ? Float8{E}(reinterpret(UInt16, x)) : Float8{E}((reinterpret(UInt16, -x) % UInt8) | sign_mask(Float8{E})
+Float8{E}(x::Int32) where {E} = !signbit(x) ? Float8{E}(reinterpret(UInt32, x)) : Float8{E}((reinterpret(UInt32, -x) % UInt8) | sign_mask(Float8{E})
+Float8{E}(x::Int64) where {E} = !signbit(x) ? Float8{E}(reinterpret(UInt64, x)) : Float8{E}((reinterpret(UInt64, -x) % UInt8) | sign_mask(Float8{E})
+
+UInt8(x::T) where {E, T<:Float8{E}} = value(x)
+Int8(x::T) where {E, T<:Float8{E}} = reinterpret(Int8, value(x))
+       
 
 exponent_bits(::Type{T}) where {E, T<:Float8{E}} = UInt8(E)
 significand_bits(::Type{T}) where {E, T<:Float8{E}} = 0x07 - UInt8(E)
 exponent_bits(float8::T) where {E, T<:Float8{E}} = exponent_bits(T)
 significand_bits(float8::T) where {E, T<:Float8{E}} = significand_bits(T)
 
-UInt8(x::T) where {E, T<:Float8{E}} = value(x)
-Int8(x::T) where {E, T<:Float8{E}} = reinterpret(Int8, value(x))
+
   
 # following float.jl loosely
 

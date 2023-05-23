@@ -122,6 +122,7 @@ const Inf8    = 0b0111_1110 # 0x7e
 const PosInf8 = 0b0111_1110 # 0x7e
 const NegInf8 = 0b1111_1110 # 0xfe
 
+# form NaN8E1, NaN8E2, .., NaN8E7 ... NegInf8E7
 for I in (0, 1, 2, 3, 4, 5, 6, 7)
     E = Symbol(:E,I)
     for Const8 in (:NaN8, :Zero8, :Inf8, :PosInf8, :NegInf8)
@@ -157,23 +158,24 @@ function isinteger(x::T) where {E, T<:Float8{E}}
    isinfnan(x) && return false
    ax = abs(x)
    ax < one(T) && return false
+   gte1_isinteger(ax)
+end
+
+@inline function gte1_isinteger(ax::T) where {E, T<:Float8{E}}
    exponent_gte = FP_bias(E) + significand_bits(T)
    unshift_exponent(ax) >= exponent_gte
 end
 
-function notinfnan_isinteger(x::T) where {E, T<:Float8{E}}
-   ax = abs(x)
-   ax < one(T) && return false
-   exponent_gte = FP_bias(E) + significand_bits(T)
-   unshift_exponent(ax) >= exponent_gte
-end
+isnoninteger(x::T) where {E, T<:Float8{E}) = !isinfnan(x) && !isinteger(x)
+isfractional(x::T) where {E, T<:Float8{E}} = !isinfnan(x) && !iszero(x) && abs(x) < one(T)
 
-isnoninteger(x::T) where {E, T<:Float8{E}) = !isinfnan(x) && !notinfnan_isinteger(x)
-isfractional(x::T) where {E, T<:Float8{E}} = !isinfnan(x) && abs(x) < one(T) && !iszero(x)
-
-#=              
+#=
+zero(T)
+one(T)
 Base.isone
 =#
+zero(x::T) where {E, T<:Float8{E}) = Float8{E}(Zero8)
+one(x::T) where {E, T<:Float8{E}) = Float8{E}(exponent_one(exponent_bits(E))) 
 
 function abs(x::T) where {E, T<:Float8{E}}
     (isnan(x) || isnonnegative(x)) && return x

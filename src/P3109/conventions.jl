@@ -175,7 +175,9 @@ one(T)
 Base.isone
 =#
 zero(x::T) where {E, T<:Float8{E}) = Float8{E}(Zero8)
-one(x::T) where {E, T<:Float8{E}) = Float8{E}(exponent_one(exponent_bits(E))) 
+one(x::T) where {E, T<:Float8{E}) = Float8{E}(exponent_one(exponent_bits(E)))
+
+isone(x::T) where {E, T<:Float8{E}) = value(x) === value(one(T))
 
 function abs(x::T) where {E, T<:Float8{E}}
     (isnan(x) || isnonnegative(x)) && return x

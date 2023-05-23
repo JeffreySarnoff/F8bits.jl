@@ -2,7 +2,7 @@ export NaN8E3, NaN8E4, NaN8E5,
        Zero8E3, Zero8E4, Zero8E5,
        Inf8E3, Inf8E4, Inf8E5,
        ispositive, isnonnegative, isnonpositive, isnegative,
-       isinfnan, isnormal,
+       isinfnan, isposinf, isneginf, isnormal,
        isnoninteger, isfractional,  # isnoninteger(1.5) && !isfractional(0.5), isnoninteger(0.5) && isfractional(0.5)
 
 import Base: reinterpret, 
@@ -13,6 +13,9 @@ import Base: reinterpret,
              zero, one, iszero, isone,
              isnan, isinf, isreal, isfinite, isinteger, issubnormal,
              nextfloat, prevfloat
+
+import Base: ==, !=, <, <=, >=, >,
+             +, -, *, /
 
 abstract type AbstractFloat8 <: AbstractFloat end
 
@@ -119,9 +122,11 @@ for I in (0, 1, 2, 3, 4, 5, 6, 7)
     end; 
 end;
 
-iszero(x::Float8{E}) where {E} = value(x) === Zero8isssf
+iszero(x::Float8{E}) where {E} = value(x) === Zero8
 isnan(x::Float8{E}) where {E} = value(x) === NaN8
 isinf(x::Float8{E}) where {E} = (value(x) & sign_unmask(Float8{E})) === Inf8
+isposinf(x::Float8{E}) where {E} = value(x) === Inf8
+isneginf(x::Float8{E}) where {E} = value(x) === NegInf8
 isreal(x::Float8{E}) where {E} = !isnan(x)
 isfinite(x::Float8{E}) where {E} = !isinf(x) && !isnan(x)
 isinfnan(x::Float8{E}) where {E} = isinf(x) || isnan(x)
@@ -163,12 +168,21 @@ FP8_significance(significand_bits, exponent, significand) = exponent > 0 ? 1 + s
 
 FP8_value(exponent_bits, exponent, significand) = FP8_significance(7-exponent_bits, exponent, significand) * 
                                                   FP8_exponent(exponent_bits, exponent)
-              
+#=              
 Base.isone
 Base.nextfloat
 Base.prevfloat
-Base.isinteger
+=#
 
-
-
-Base
+function nextfloat(x::T) where {E, T<:Float8{E}}
+    (isposinf(x) || isnan(x)) && return x
+    isnonnegative(x) && return T(value(x) + 0x01)
+    return T( ((value(x) & sign_unmask(x)) - 0x01) | sign_mask(T) )
+endne
+       
+function prevfloat(x::T) where {E, T<:Float8{E}}
+    (isneginf(x) || isnan(x)) && return x
+    ispositive(x) && return T(value(x) - 0x01)
+    iszero(x) && return T(0x81)
+    return T( ((value(x) & sign_unmask(x)) + 0x01) | sign_mask(T) )
+end

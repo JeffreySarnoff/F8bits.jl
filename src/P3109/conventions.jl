@@ -29,6 +29,11 @@ Float8{E}(x::Int8) = Float8{E}(reinterpret(UInt8, x))
 
 value(float8::Float8{E}) = float8.x
 
+exponent_bits(::Type{T}) where {E, T<:Float8{E}} = UInt8(E)
+significand_bits(::Type{T}) where {E, T<:Float8{E}} = 0x07 - UInt8(E)
+exponent_bits(float8::T) where {E, T<:Float8{E}} = exponent_bits(T)
+significand_bits(float8::T) where {E, T<:Float8{E}} = significand_bits(T)
+
 UInt8(x::T) where {E, T<:Float8{E}} = value(x)
 Int8(x::T) where {E, T<:Float8{E}} = reinterpret(Int8, value(x))
   

@@ -113,6 +113,8 @@ shift_significand(::Type{Float8{E}}, x::UInt8) where {E} = (x & significand_mask
 
 exponent_one(::Type{T})  where {E, T<:Float8{E}} = exponent_mask(T) - sign_mask(T) >> 1
 exponent_half(::Type{T}) where {E, T<:Float8{E}} = (exponent_one(T) >> significand_bits(T) - 0x01) << significand_bits(T)
+exponent_two(::Type{T})  where {E, T<:Float8{E}} = shift_exponent(unshift_exponent(exponent_one(T)) + 0x01)
+
 
 const NaN8    = 0b1111_1111 # 0xff
 const Zero8   = 0b0000_0000 # 0x00
@@ -152,8 +154,9 @@ end
 isnormal(x::T) where {E, T<:Float8{E}} = !issubnormal(x) && !isinfnan(x)
 
 function isinteger(x::T) where {E, T<:Float8{E}}
+   isinfnan(x) && return false
    ax = abs(x)
-   (isinfnan(x) || ax < one(T)) && return false
+   ax < one(T) && return false
    exponent_gte = FP_bias(E) + significand_bits(T)
    unshift_exponent(ax) >= exponent_gte
 end

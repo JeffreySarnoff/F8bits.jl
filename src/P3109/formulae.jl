@@ -20,6 +20,6 @@ pos_normal_sym(exp_bits, sig_bits, raw_exp, raw_sig) = implicit_sig(sig_bits, ra
 
 # positive subnormal floating point values
 pos_subnormal_754(exp_bits, sig_bits, raw_exp, raw_sig) = explicit_sig(sig_bits, raw_sig) * scale_754(exp_bits, raw_exp)
-pos_sibnormal_sym(exp_bits, sig_bits, raw_exp, raw_sig) = explicit_sig(sig_bits, raw_sig) * scale_sym(exp_bits, raw_exp)
+pos_subnormal_sym(exp_bits, sig_bits, raw_exp, raw_sig) = explicit_sig(sig_bits, raw_sig) * scale_sym(exp_bits, raw_exp)
 
 
